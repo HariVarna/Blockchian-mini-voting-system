@@ -1,0 +1,55 @@
+# Dependencies
+node_modules/
+*/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Next.js build and cache
+.next/
+*/.next/
+out/
+*/out/
+
+# Build outputs
+build/
+*/build/
+dist/
+*/dist/
+*.tsbuildinfo
+
+# Hardhat & Smart Contracts
+contracts/cache/
+contracts/artifacts/
+contracts/typechain-types/
+cache/
+artifacts/
+typechain-types/
+
+# Database
+*.sqlite
+*.sqlite3
+*.db
+*.db-journal
+backend/prisma/*.db
+backend/prisma/*.db-journal
+
+# Environment files
+.env
+.env*.local
+*.env
+!.env.example
+!*/.env.example
+
+# IDE & OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# Logs
+*.log
+logs/

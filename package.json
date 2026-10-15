@@ -1,0 +1,21 @@
+{
+  "name": "blockchain-mini-voting-system",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Decentralized, privacy-preserving Blockchain Mini Voting System with multi-signature governance, OTP authentication, and smart contracts",
+  "scripts": {
+    "dev:contracts": "cd contracts && npm run node:local",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "blockchain": "cd contracts && npm run node:local",
+    "deploy:local": "cd contracts && npm run deploy:local",
+    "seed": "cd backend && npm run seed",
+    "test:contracts": "cd contracts && npm run test",
+    "build:contracts": "cd contracts && npm run build",
+    "build:backend": "cd backend && npm run build",
+    "build:frontend": "cd frontend && npm run build"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

@@ -1,0 +1,110 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id            String   @id @default(uuid())
+  walletAddress String   @unique
+  name          String
+  email         String
+  emailVerified Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  ballots       Ballot[]
+}
+
+model OtpVerification {
+  id        String   @id @default(uuid())
+  email     String
+  otpHash   String
+  expiresAt DateTime
+  attempts  Int      @default(0)
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model Election {
+  id                   String      @id @default(uuid())
+  blockchainElectionId Int         @unique
+  title                String
+  description          String
+  startTime            DateTime
+  endTime              DateTime
+  status               String      @default("NOT_STARTED") // NOT_STARTED, OPEN, CLOSED, RESULTS_PUBLISHED, PAUSED
+  createdAt            DateTime    @default(now())
+  updatedAt            DateTime    @updatedAt
+
+  candidates           Candidate[]
+  ballots              Ballot[]
+  results              Result?
+}
+
+model Candidate {
+  id                    String   @id @default(uuid())
+  electionId            String
+  blockchainCandidateId Int
+  name                  String
+  party                 String
+  imageUrl              String
+  slogan                String
+  policyStatement       String
+  manifestoUrl          String?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  election              Election @relation(fields: [electionId], references: [id], onDelete: Cascade)
+
+  @@unique([electionId, blockchainCandidateId])
+}
+
+model Ballot {
+  id               String   @id @default(uuid())
+  electionId       String
+  walletAddress    String
+  encryptedVote    String   // Encrypted candidateId payload (AES-256)
+  ballotCommitment String   @unique // keccak256 hash
+  txHash           String?
+  blockNumber      Int?
+  status           String   @default("RECORDED") // PENDING, RECORDED, VERIFIED
+  createdAt        DateTime @default(now())
+
+  election         Election @relation(fields: [electionId], references: [id], onDelete: Cascade)
+  user             User?    @relation(fields: [walletAddress], references: [walletAddress])
+}
+
+model AdminApproval {
+  id                String   @id @default(uuid())
+  proposalId        Int      @unique
+  actionType        String   // OPEN_ELECTION, CLOSE_ELECTION, PUBLISH_RESULTS, EMERGENCY_PAUSE, RESUME
+  targetElectionId  Int
+  proposalHash      String
+  calldata          String
+  description       String
+  requiredApprovals Int      @default(2)
+  approvals         String   // JSON string array of approving admin wallet addresses
+  executed          Boolean  @default(false)
+  cancelled         Boolean  @default(false)
+  createdAt         DateTime @default(now())
+}
+
+model Result {
+  id                  String   @id @default(uuid())
+  electionId          String   @unique
+  resultHash          String
+  winnerCandidateId   Int?
+  isTie               Boolean  @default(false)
+  candidateCountsJson String   // JSON mapping of candidateId => count
+  totalVotes          Int      @default(0)
+  turnoutPercentage   Float    @default(0.0)
+  publishedOnChain    Boolean  @default(false)
+  txHash              String?
+  createdAt           DateTime @default(now())
+
+  election            Election @relation(fields: [electionId], references: [id], onDelete: Cascade)
+}
